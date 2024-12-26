@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewData["Title"] = "Admin";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+
+<div>
+    <label for="userid">UserId:</label>
+    <span id="userid"></span>
+</div>
+<div>
+    <label for="username">Username:</label>
+    <span id="username"></span>
+</div>
+
+<div>
+    <label for="email">Email:</label>
+    <span id="email"></span>
+</div>
+<script>
+    // Trang M/index
+    document.addEventListener('DOMContentLoaded', function () {
+        // Lấy ID từ Local Storage
+        var userId = localStorage.getItem('userId');
+        GetByIdUser(userId);
+        // Hiển thị ID khi nhấp vào phần tử có lớp "showIdButton"
+    });
+
+    function GetByIdUser(userId) {
+        // Gửi yêu cầu GET để lấy thông tin từ API
+        $.ajax({
+            url: "https://localhost:44314/api/Auth/GetUserById/" + userId,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Hiển thị thông tin tài khoản
+                $("#userid").text(userId);
+                $("#username").text(data.username);
+                $("#email").text(data.email);
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+</script>

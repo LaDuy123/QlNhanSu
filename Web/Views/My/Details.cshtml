@@ -1,0 +1,279 @@
+﻿
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+<section class="colorlib-services" data-section="services">
+    <div class="colorlib-narrow-content">
+        <div class="row">
+              <div class="col-md-6">
+                <section class="row" id="employeeSection">
+                    <div  id="employeeContainer">
+                        <!-- Phần hiển thị danh sách nhân viên -->
+                    </div>
+
+                </section>
+                <button id="delete" >Xóa nhân viên</button>
+
+            </div>
+                  
+        
+            <div class="col-md-6">
+                <h1>Sửa thông tin nhân viên</h1>
+                <button id="showEditFormButton">Sửa thông tin</button>
+                <form id="editForm">
+                    <!-- Các ô nhập liệu ở bên phải -->
+@*                     <div class="form-group">
+                        <label for="maNV">Mã NV:</label>
+                        <input type="number" id="maNV" name="maNV" required>
+                    </div> *@
+
+                    <div class="form-group">
+                        <label for="hoTen">Họ tên:</label>
+                        <input type="text" id="hoTen" name="hoTen" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="diaChi">Địa chỉ:</label>
+                        <input type="text" id="diaChi" name="diaChi" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dienThoai">Điện thoại:</label>
+                        <input type="tel" id="dienThoai" name="dienThoai" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ngaySinh">Ngày sinh:</label>
+                        <input type="date" id="ngaySinh" name="ngaySinh" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="luong">Lương:</label>
+                        <input type="number" id="luong" name="luong" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anh">Ảnh:</label>
+                        <input type="text" id="anh" name="anh">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="congViec">Công việc:</label>
+                        <input type="text" id="maCongViec" name="congViec" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phongBan">Phòng ban:</label>
+                        <input type="text" id="maPhongBan" name="phongBan" required>
+                    </div>
+
+                    <button type="submit">Lưu</button>
+                </form>
+            </div>
+
+          
+        </div>
+    </div>
+</section>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    var editForm = document.getElementById('editForm');
+    var showEditFormButton = document.getElementById('showEditFormButton');
+
+    // Ẩn form sửa thông tin nhân viên
+    editForm.style.display = 'none';
+
+    // Khi nhấn vào nút "Sửa thông tin"
+    showEditFormButton.addEventListener('click', function () {
+        // Hiển thị form sửa thông tin nhân viên
+        editForm.style.display = 'block';
+        showEditFormButton.style.display = 'none';
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        var url = window.location.href;
+        var id = getIdFromUrl(url);
+        if (id) {
+            GetByIdNhanVien(id);
+        }
+    });
+
+    function getIdFromUrl(url) {
+        var id = null;
+        var urlParts = url.split('/');
+        var lastPart = urlParts[urlParts.length - 1];
+        if (!isNaN(lastPart)) {
+            id = parseInt(lastPart);
+        }
+        return id;
+    }
+
+    function GetByIdNhanVien(id) {
+        $.ajax({
+            url: 'https://localhost:44314/api/NhanVien/GetById/' + id,
+            method: 'GET',
+            contentType: 'application/json',
+            dataType: 'json',
+            error: function (response) {
+                console.log(response);
+            },
+            success: function (response) {
+                var employeeContainer = $('#employeeContainer');
+                employeeContainer.empty(); // Xóa dữ liệu cũ
+
+                if (response) {
+                    var employeeHtml = `
+                                <div class="col-sm-12">
+                                    <img src="/images/${response.anh}" width="200px" height="200px" />
+                                    <div >
+                                            <h3>Họ tên : ${response.hoTen}</h3>
+                                            <p>Công việc : ${response.congViec}</p>
+                                            <p>Phòng ban : ${response.phongBan}</p>
+                                            <p>Địa chỉ: ${response.diaChi}</p>
+                                            <p>Điện thoại: ${response.dienThoai}</p>
+                                            <p>Email: ${response.email}</p>
+                                            <p>Ngày sinh: ${response.ngaySinh}</p>
+                                            <p>Lương: ${response.luong}</p>
+                                    </div>
+                                    <hr>
+                                </div>
+                            `;
+                    employeeContainer.append(employeeHtml);
+                }
+            },
+            fail: function (response) {
+                console.log(response);
+            }
+        });
+    }
+
+    $(document).on("click", "#showEditFormButton", function () {
+        // Lấy giá trị id từ URL
+        var url = window.location.href;
+        var id = url.substring(url.lastIndexOf("/") + 1);
+
+        // Gửi yêu cầu GET để lấy thông tin từ API
+        $.ajax({
+            url: "https://localhost:7260/api/NhanVien/GetById/" + id,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Đưa thông tin vào các ô nhập liệu
+                $("#hoTen").val(data.hoTen);
+                $("#diaChi").val(data.diaChi);
+                $("#dienThoai").val(data.dienThoai);
+                $("#email").val(data.email);
+                $("#ngaySinh").val(data.ngaySinh);
+                $("#luong").val(data.luong);
+                $("#anh").val(data.anh);
+                $("#maCongViec").val(data.maCongViec);
+                $("#maPhongBan").val(data.maPhongBan);
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    // Gán sự kiện submit cho form
+    $("form").submit(function (event) {
+        event.preventDefault(); // Ngăn chặn việc gửi form mặc định
+        var url = window.location.href;
+        var id = getIdFromUrl(url);
+        // Lấy giá trị từ các trường nhập liệu trong form
+        var hoTen = $("#hoTen").val();
+        var diaChi = $("#diaChi").val();
+        var dienThoai = $("#dienThoai").val();
+        var email = $("#email").val();
+        var ngaySinh = $("#ngaySinh").val();
+        var maCongViec = $("#maCongViec").val();
+        var maPhongBan = $("#maPhongBan").val();
+        var luong = $("#luong").val();
+        var anh = $("#anh").val();
+
+        // Tạo một đối tượng chứa dữ liệu
+        var data = {
+            HoTen: hoTen,
+            DiaChi: diaChi,
+            DienThoai: dienThoai,
+            Email: email,
+            NgaySinh: ngaySinh,
+            MaCongViec: maCongViec,
+            MaPhongBan: maPhongBan,
+            Luong: luong,
+            Anh: anh
+        };
+        // alert(dienThoai);
+        // alert(email);
+        // alert(ngaySinh);
+        // alert(maCongViec);
+        // alert(maPhongBan);
+        // alert(luong);
+        // alert(anh);
+
+
+
+
+        // Gửi yêu cầu PUT đến API
+        $.ajax({
+            url: "https://localhost:7260/api/NhanVien/Update/" + id,
+            type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                // Xử lý thành công
+                alert("Cập nhật thành công");
+                // $('#hoTen').val('');
+                // $('#diaChi').val('');
+                // $('#dienThoai').val('');
+                // $('#email').val('');
+                // $('#ngaySinh').val('');
+                // $('#luong').val('');
+                // $('#anh').val('');
+                // $('#maCongViec').val('');
+                // $('#maPhongBan').val('');
+            },
+            error: function (error) {
+                // Xử lý lỗi
+                alert("Cập nhật không thành công");
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#delete').click(function () {
+            var url = window.location.href;
+            var id = getIdFromUrl(url);
+            $.ajax({
+                url: 'https://localhost:7260/api/NhanVien/Delete/' + id,
+                type: 'DELETE',
+                success: function (response) {
+                    alert('Nhân viên đã được xóa thành công');
+                    window.location.href = 'https://localhost:7098/My/Index';
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 404) {
+                        alert('Không tìm thấy nhân viên');
+                    } else {
+                        alert('Lỗi khi xóa nhân viên:', errorThrown);
+                    }
+                }
+            });
+        });
+    });
+</script>
+

@@ -1,0 +1,135 @@
+﻿
+@{
+    ViewData["Title"] = "Mapbox";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+
+<div id="header">
+    <div id="languageSelector">
+        <select id="languageDropdown">
+            <option value="en">English</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="fr">Français</option>
+            <!-- Thêm các tùy chọn ngôn ngữ khác nếu cần -->
+        </select>
+    </div>
+
+    <div id="search-container">
+        <div id="search-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        <div id="close-icon">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+</div>
+<div id='map' style='width: 600px; height: 400px;'></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZHV5bGEiLCJhIjoiY2x1dzVrd3JuMGEzOTJrcGZmOGhzY215cCJ9.XnWpexbqQDVjTr_Zloeqqg';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [105.85, 21.0], //Tọa độ lãnh thổ Việt Nam
+        zoom: 5,
+        language: 'en',
+    });
+
+    var marker = new mapboxgl.Marker({
+        color: "red", //Màu của Marker là đỏ
+        draggable: true,
+        anchor: 'bottom', //Nhãn Hà Nội nằm dưới Marker
+    }).setLngLat([105.85, 21.0]) //Thiết lập Marker tại hà Nội
+        .addTo(map);
+
+    // var popup = new mapboxgl.Popup({
+    //     closeButton: true,
+    //     closeOnClick: false,
+    //     anchor: 'right',
+    //  }).setLngLat([105.85, 21.0])
+    //     .setHTML("<h1>Hello HN!</h1>")
+    //     .addTo(map);
+
+    //phóng to nhỏ bằng + và -
+    map.addControl(new mapboxgl.NavigationControl({
+        showCompass: true,
+        showZoom: true,
+
+    }));
+
+    //xác định vị trí
+    map.addControl(new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true
+    }));
+
+    //tầm nhìn
+    var scale = new mapboxgl.ScaleControl({
+        maxWidth: 80,
+        unit: 'imperial'
+    });
+    map.addControl(scale);
+    scale.setUnit('metric');
+
+    //full màn
+    map.addControl(new mapboxgl.FullscreenControl());
+
+    //lấy vị trí
+    // map.on('click', function (e) {
+    //     var popup = new mapboxgl.Popup({
+    //         closeButton: true,
+    //         closeOnClick: true,
+
+    //     }).setLngLat([e.lngLat.lng, e.lngLat.lat])
+    //         .setHTML("<h1>vị trí nhấn là: " + e.lngLat + "</h1>")
+    //         .addTo(map);
+    // });
+
+    //thêm maker bằng dbleclick
+    map.on('dblclick', function (e) {
+        new mapboxgl.Marker({
+            color: 'blue',
+            draggable: true,
+
+        }).setLngLat([e.lngLat.lng, e.lngLat.lat])
+            .addTo(map);
+    });
+
+    //chỉ đường
+    var searchIcon = document.getElementById('search-icon');
+    var closeIcon = document.getElementById('close-icon');
+    var directionsControl = null;
+
+    searchIcon.addEventListener('click', function () {
+        searchIcon.style.display = 'none'; // Ẩn biểu tượng tìm kiếm
+        closeIcon.style.display = 'block'; // Hiển thị biểu tượng đóng
+
+        directionsControl = new MapboxDirections({
+            accessToken: mapboxgl.accessToken
+        });
+        map.addControl(directionsControl, 'top-left');
+    });
+
+    closeIcon.addEventListener('click', function () {
+        if (directionsControl) {
+            map.removeControl(directionsControl);
+            directionsControl = null;
+
+            closeIcon.style.display = 'none'; // Ẩn biểu tượng đóng
+            searchIcon.style.display = 'block'; // Hiển thị biểu tượng tìm kiếm
+        }
+    });
+
+    //ngôn ngữ
+    var languageDropdown = document.getElementById('languageDropdown');
+    languageDropdown.addEventListener('change', function () {
+        var selectedLanguage = languageDropdown.value;
+        map.setLanguage(selectedLanguage);
+    });
+
+
+</script>
+
+
+
