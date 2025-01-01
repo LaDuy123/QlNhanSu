@@ -1,0 +1,137 @@
+﻿@model Web.Dto.NhanVienDto
+
+@{
+    ViewData["Title"] = "Chi tiết nhân viên";
+}
+
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Thông tin cá nhân</h3>
+        <form id="updateForm" method="post" action="@Url.Action("Update", "NhanVien", new { id = ViewBag.NhanVienId })" enctype="multipart/form-data">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Mã nhân viên</th>
+                    <td>@ViewBag.NhanVienId</td>
+                </tr>
+                <tr>
+                    <th>Họ tên</th>
+                    <td>
+                        <input type="text" class="form-control" name="HoTen" value="@Model.HoTen" readonly="readonly" id="HoTen" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Quê quán</th>
+                    <td>
+                        <input type="text" class="form-control" name="QueQuan" value="@Model.QueQuan" readonly="readonly" id="QueQuan" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Giới tính</th>
+                    <td>
+                        <input type="text" class="form-control" name="GioiTinh" value="@Model.GioiTinh" readonly="readonly" id="GioiTinh" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Điện thoại</th>
+                    <td>
+                        <input type="text" class="form-control" name="DienThoai" value="@Model.DienThoai" readonly="readonly" id="DienThoai" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Dân tộc</th>
+                    <td>
+                        <input type="text" class="form-control" name="DanToc" value="@Model.DanToc" readonly="readonly" id="DanToc" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Địa chỉ</th>
+                    <td>
+                        <input type="text" class="form-control" name="DiaChi" value="@Model.DiaChi" readonly="readonly" id="DiaChi" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>
+                        <input type="email" class="form-control" name="Email" value="@Model.Email" readonly="readonly" id="Email" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Ngày sinh</th>
+                    <td>
+                        <input type="date" class="form-control" name="NgaySinh" value="@Model.NgaySinh" readonly="readonly" id="NgaySinh" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Bậc lương</th>
+                    <td>
+                        <input type="text" class="form-control" name="BacLuong" value="@Model.BacLuong" readonly="readonly" id="BacLuong" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Mã công việc</th>
+                    <td>
+                        <input type="text" class="form-control" name="MaCV" value="@Model.MaCV" readonly="readonly" id="MaCV" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Mã phòng ban</th>
+                    <td>
+                        <input type="text" class="form-control" name="MaPB" value="@Model.MaPB" readonly="readonly" id="MaPB" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Mã trình độ học vấn</th>
+                    <td>
+                        <input type="text" class="form-control" name="MaTDHV" value="@Model.MaTDHV" readonly="readonly" id="MaTDHV" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Ảnh nhân viên</th>
+                    <td>
+                        <input type="file" class="form-control" name="Anh" id="Anh" style="display:none;" />
+                        @if (!string.IsNullOrEmpty(Model.Anh))
+                        {
+                            <img src="~/images/@Model.Anh" alt="Ảnh nhân viên" class="img-fluid" id="existingImage" />
+                        }
+                        else
+                        {
+                            <p>Chưa có ảnh.</p>
+                        }
+                    </td>
+                </tr>
+            </table>
+            <button type="button" class="btn btn-warning" id="editButton">Sửa</button>
+            <button type="submit" class="btn btn-success" id="saveButton" style="display:none;">Lưu</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <!-- Nếu muốn thêm các phần khác, có thể tiếp tục ở đây -->
+    </div>
+</div>
+
+<div>
+    <a href="@Url.Action("Index", "NhanVien")" class="btn btn-primary">Quay lại danh sách</a>
+</div>
+
+    <script>
+        // Khi nhấn nút "Sửa"
+        document.getElementById("editButton").addEventListener("click", function() {
+            // Chuyển tất cả các trường input thành editable
+            var inputs = document.querySelectorAll("#updateForm input");
+            inputs.forEach(function(input) {
+                input.removeAttribute("readonly");
+            });
+            
+            // Hiện nút "Lưu" và ẩn nút "Sửa"
+            document.getElementById("saveButton").style.display = "inline-block";
+            document.getElementById("editButton").style.display = "none";
+
+            // Hiển thị file input cho ảnh
+            document.getElementById("Anh").style.display = "inline-block";
+            document.getElementById("existingImage").style.display = "none";  // Ẩn ảnh hiện tại nếu có
+        });
+    </script>
+
+
+

@@ -1,9 +1,12 @@
 ﻿using BTL.Data;
+using BTL.Dto;
 using BTL.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace BTL.Controllers
 {
@@ -21,156 +24,238 @@ namespace BTL.Controllers
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
+            // Lấy danh sách nhân viên, bao gồm các thông tin từ các bảng liên quan
             var nhanViens = _context.NhanViens
                 .Include(nv => nv.CongViec)
                 .Include(nv => nv.PhongBan)
+                .Include(nv => nv.TrinhDoHocVan)
+                .Include(nv => nv.luong)
                 .ToList();
 
-            var nhanVienDTOs = nhanViens.Select(nv => new NhanVienDTO
+            // Ánh xạ từ NhanVien sang NhanVienDTO
+            var nhanVienDTOs = nhanViens.Select(nv => new NhanVienDto
             {
                 MaNV = nv.MaNV,
                 HoTen = nv.HoTen,
-                DiaChi = nv.DiaChi,
+                QueQuan = nv.QueQuan,
+                GioiTinh = nv.GioiTinh,
                 DienThoai = nv.DienThoai,
+                DanToc = nv.DanToc,
+                DiaChi = nv.DiaChi,
                 Email = nv.Email,
                 NgaySinh = nv.NgaySinh,
-                Luong = nv.Luong,
+                MaCV = nv.MaCV,
+                MaPB = nv.MaPB,
+                MaTDHV = nv.MaTDHV,
+                BacLuong = nv.BacLuong,
                 Anh = nv.Anh,
-                MaCongViec = nv.MaCongViec,
-                MaPhongBan = nv.MaPhongBan,
-                CongViec = nv.CongViec?.TenCongViec,
-                PhongBan = nv.PhongBan?.TenPhongBan
+                CongViec = nv.CongViec?.TenCV,
+                PhongBan = nv.PhongBan?.TenPB,
+                TrinhDoHocVan = nv.TrinhDoHocVan?.TenTDHV,
+                Luong = nv.luong?.CalculatedTongLuong,
             });
 
+            // Trả về kết quả dưới dạng JSON
             return Ok(nhanVienDTOs);
         }
 
-        [HttpGet("GetById/{id}")]
-        public IActionResult GetById(int id)
+
+        [HttpGet("ById/{id}")]
+        public IActionResult GetNhanVienById(int id)
         {
-            var nv = _context.NhanViens
-                .Include(n => n.CongViec)
-                .Include(n => n.PhongBan)
-                .SingleOrDefault(n => n.MaNV == id);
-
-            if (nv != null)
-            {
-                var nvDTO = new NhanVienDTO
-                {
-                    MaNV = nv.MaNV,
-                    HoTen = nv.HoTen,
-                    DiaChi = nv.DiaChi,
-                    DienThoai = nv.DienThoai,
-                    Email = nv.Email,
-                    NgaySinh = nv.NgaySinh,
-                    Luong = nv.Luong,
-                    Anh = nv.Anh,
-                    CongViec = nv.CongViec?.TenCongViec,
-                    PhongBan = nv.PhongBan?.TenPhongBan
-                };
-
-                return Ok(nvDTO);
-            }
-            else
+            var nhanVien = _context.NhanViens.FirstOrDefault(n => n.MaNV == id);
+            if (nhanVien == null)
             {
                 return NotFound();
             }
+            return Ok(nhanVien);
         }
-        [HttpGet("GetByName/{name}")]
-        public IActionResult GetByName(string name)
+        [HttpGet("ByName/{name}")]
+        public IActionResult GetNhanVienByName(string name)
         {
-            var nvs = _context.NhanViens
-                .Include(n => n.CongViec)
-                .Include(n => n.PhongBan)
-                .Where(n => n.HoTen.Contains(name))
-                .Select(n => new NhanVienDTO
-                {
-                    MaNV = n.MaNV,
-                    HoTen = n.HoTen,
-                    DiaChi = n.DiaChi,
-                    DienThoai = n.DienThoai,
-                    Email = n.Email,
-                    NgaySinh = n.NgaySinh,
-                    Luong = n.Luong,
-                    Anh = n.Anh,
-                    CongViec = n.CongViec != null ? n.CongViec.TenCongViec : null,
-                    PhongBan = n.PhongBan != null ? n.PhongBan.TenPhongBan : null
-                })
-                .ToList();
+            var nhanViens = _context.NhanViens
+                                    .Where(n => n.HoTen.Contains(name))
+                                    .ToList();
 
-            if (nvs.Count > 0)
+            if (nhanViens == null || nhanViens.Count == 0)
             {
-                return Ok(nvs);
+                return NotFound(new { message = "Không tìm thấy nhân viên nào." });
             }
-            else
-            {
-                return NotFound();
-            }
+
+            return Ok(nhanViens);
         }
+
         [HttpPost("Create")]
-        public IActionResult Create(NhanVienModel model)
+        public async Task<IActionResult> CreateNhanVien(NhanVienCreateDto model)
         {
-            try
+            if (model == null || model.Anh == null)
             {
-                var nv = new NhanVien
+                return BadRequest("Dữ liệu không hợp lệ hoặc ảnh chưa được chọn.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    HoTen = model.HoTen,
-                    DiaChi = model.DiaChi,
-                    DienThoai = model.DienThoai,
-                    Email = model.Email,
-                    NgaySinh = model.NgaySinh,
-                    MaCongViec = model.MaCongViec,
-                    MaPhongBan = model.MaPhongBan,
-                    Luong = model.Luong,
-                    Anh = model.Anh,
-                };
-                _context.Add(nv);
-                _context.SaveChanges();
-                return Ok(nv);
+                    string fileName = null;
+
+                    // Lưu ảnh vào thư mục wwwroot/images
+                    if (model.Anh != null)
+                    {
+                        var folderPath = Path.Combine("wwwroot", "images");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+
+                        // Giữ nguyên tên file ảnh
+                        fileName = model.Anh.FileName;
+
+                        var filePath = Path.Combine(folderPath, fileName);
+
+                        // Lưu file và ghi đè nếu đã tồn tại
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await model.Anh.CopyToAsync(fileStream);
+                        }
+                    }
+
+
+                    // Chuyển đổi từ DTO sang entity
+                    var nhanVien = new NhanVien
+                    {
+                        HoTen = model.HoTen,
+                        QueQuan = model.QueQuan,
+                        GioiTinh = model.GioiTinh,
+                        DienThoai = model.DienThoai,
+                        DanToc = model.DanToc,
+                        DiaChi = model.DiaChi,
+                        Email = model.Email,
+                        NgaySinh = model.NgaySinh,
+                        MaCV = model.MaCV,
+                        MaPB = model.MaPB,
+                        MaTDHV = model.MaTDHV,
+                        BacLuong = model.BacLuong,
+                        Anh = fileName // Lưu đường dẫn ảnh trong cơ sở dữ liệu
+                    };
+
+                    // Thêm nhân viên vào cơ sở dữ liệu
+                    _context.NhanViens.Add(nhanVien);
+                    await _context.SaveChangesAsync();
+
+                    // Trả về thông báo thành công
+                    return CreatedAtAction("GetNhanVienById", new { id = nhanVien.MaNV }, nhanVien);
+                }
+                catch (Exception ex)
+                {
+                    // Trả về lỗi nếu xảy ra vấn đề trong quá trình xử lý
+                    return StatusCode(500, "Đã xảy ra lỗi khi thêm nhân viên: " + ex.Message);
+                }
             }
-            catch
-            {
-                return BadRequest();
-            }
+
+            // Trả về lỗi nếu model không hợp lệ
+            return BadRequest(ModelState);
         }
 
         [HttpPut("Update/{id}")]
-        public IActionResult Edit(int id, NhanVienModel model)
+        public async Task<IActionResult> UpdateNhanVien(int id, NhanVienUpdateDto model)
         {
-            var nv = _context.NhanViens.SingleOrDefault(l => l.MaNV == id);
-            if (nv != null)
+            if (model == null)
             {
-                nv.HoTen = model.HoTen;
-                nv.DiaChi = model.DiaChi;
-                nv.DienThoai = model.DienThoai;
-                nv.Email = model.Email;
-                nv.NgaySinh = model.NgaySinh;
-                nv.MaCongViec = model.MaCongViec;
-                nv.MaPhongBan = model.MaPhongBan;
-                nv.Luong = model.Luong;
-                nv.Anh = model.Anh;
-                _context.SaveChanges();
-                return Ok();
+                return BadRequest("Dữ liệu không hợp lệ.");
             }
-            else
+
+            // Kiểm tra xem nhân viên có tồn tại không
+            var nhanVien = await _context.NhanViens.FindAsync(id);
+            if (nhanVien == null)
             {
-                return NotFound();
+                return NotFound($"Nhân viên với ID {id} không tồn tại.");
             }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    string fileName = nhanVien.Anh; // Giữ nguyên tên file ảnh cũ nếu không có thay đổi ảnh
+
+                    // Kiểm tra và cập nhật ảnh mới nếu có
+                    if (model.Anh != null)
+                    {
+                        var folderPath = Path.Combine("wwwroot", "images");
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+
+                        // Lưu ảnh mới, ghi đè nếu đã tồn tại
+                        fileName = model.Anh.FileName;
+                        var filePath = Path.Combine(folderPath, fileName);
+
+                        // Xóa ảnh cũ nếu có ảnh mới (nếu cần)
+                        var oldFilePath = Path.Combine(folderPath, nhanVien.Anh);
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await model.Anh.CopyToAsync(fileStream);
+                        }
+                    }
+
+                    // Cập nhật thông tin nhân viên (chỉ cập nhật nếu có giá trị mới)
+                    nhanVien.HoTen = model.HoTen ?? nhanVien.HoTen;
+                    nhanVien.QueQuan = model.QueQuan ?? nhanVien.QueQuan;
+                    nhanVien.GioiTinh = model.GioiTinh ?? nhanVien.GioiTinh;
+                    nhanVien.DienThoai = model.DienThoai ?? nhanVien.DienThoai;
+                    nhanVien.DanToc = model.DanToc ?? nhanVien.DanToc;
+                    nhanVien.DiaChi = model.DiaChi ?? nhanVien.DiaChi;
+                    nhanVien.Email = model.Email ?? nhanVien.Email;
+                    nhanVien.NgaySinh = model.NgaySinh ?? nhanVien.NgaySinh;
+                    nhanVien.MaCV = model.MaCV ?? nhanVien.MaCV;
+                    nhanVien.MaPB = model.MaPB ?? nhanVien.MaPB;
+                    nhanVien.MaTDHV = model.MaTDHV ?? nhanVien.MaTDHV;
+                    nhanVien.BacLuong = model.BacLuong ?? nhanVien.BacLuong;
+                    nhanVien.Anh = fileName; // Cập nhật ảnh mới nếu có
+
+                    // Lưu thay đổi vào cơ sở dữ liệu
+                    _context.NhanViens.Update(nhanVien);
+                    await _context.SaveChangesAsync();
+
+                    // Trả về thông báo thành công
+                    return Ok(nhanVien);
+                }
+                catch (Exception ex)
+                {
+                    // Trả về lỗi nếu có vấn đề trong quá trình xử lý
+                    return StatusCode(500, "Đã xảy ra lỗi khi cập nhật nhân viên: " + ex.Message);
+                }
+            }
+
+            // Trả về lỗi nếu model không hợp lệ
+            return BadRequest(ModelState);
         }
+
+
         [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
-            var nv = _context.NhanViens.SingleOrDefault(l => l.MaNV == id);
-            if (nv != null)
+            var nhanVien = _context.NhanViens.Find(id);
+            if (nhanVien == null)
             {
-                _context.NhanViens.Remove(nv);
-                _context.SaveChanges();
-                return Ok();
+                return NotFound(new { message = "Nhân viên không tồn tại." });
             }
-            else
-            {
-                return NotFound();
-            }
+
+            _context.NhanViens.Remove(nhanVien);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Nhân viên đã được xóa thành công." });
+        }
+        [HttpPost]
+        public IActionResult Upload(IFormFile file)
+        {
+            return null;
         }
 
     }

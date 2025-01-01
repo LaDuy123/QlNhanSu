@@ -1,0 +1,98 @@
+﻿@model Web.Dto.NhanVienCreateDto
+@{
+    ViewData["Title"] = "Thêm Nhân Viên";
+}
+
+<h2>Thêm Nhân Viên</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="HoTen">Họ Tên</label>
+        <input type="text" class="form-control" id="HoTen" name="HoTen" value="@Model.HoTen" required />
+    </div>
+
+    <div class="form-group">
+        <label for="QueQuan">Quê Quán</label>
+        <input type="text" class="form-control" id="QueQuan" name="QueQuan" value="@Model.QueQuan" required />
+    </div>
+
+    <div class="form-group">
+        <label for="GioiTinh">Giới Tính</label>
+        <select class="form-control" id="GioiTinh" name="GioiTinh">
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="DienThoai">Điện Thoại</label>
+        <input type="text" class="form-control" id="DienThoai" name="DienThoai" value="@Model.DienThoai" />
+    </div>
+
+    <div class="form-group">
+        <label for="DanToc">Dân Tộc</label>
+        <input type="text" class="form-control" id="DanToc" name="DanToc" value="@Model.DanToc" />
+    </div>
+
+    <div class="form-group">
+        <label for="DiaChi">Địa Chỉ</label>
+        <input type="text" class="form-control" id="DiaChi" name="DiaChi" value="@Model.DiaChi" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" />
+    </div>
+
+    <div class="form-group">
+        <label for="NgaySinh">Ngày Sinh</label>
+        <input type="date" class="form-control" id="NgaySinh" name="NgaySinh" value="@Model.NgaySinh" required/>
+    </div>
+
+    <div class="form-group">
+        <label for="CongViec">Công Việc</label>
+        <select class="form-control" id="CongViec" name="MaCV">
+            @foreach (var item in ViewBag.CongViec)
+            {
+                <option value="@item.MaCV" >@item.TenCV</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="PhongBan">Phòng Ban</label>
+        <select class="form-control" id="PhongBan" name="MaPB">
+            @foreach (var item in ViewBag.PhongBan)
+            {
+                <option value="@item.MaPB" >@item.TenPB</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="TrinhDoHocVan">Trình Độ Học Vấn</label>
+        <select class="form-control" id="TrinhDoHocVan" name="MaTDHV">
+            @foreach (var item in ViewBag.TrinhDoHocVan)
+            {
+                <option value="@item.MaTDHV">@item.TenTDHV</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="BacLuong">Bậc Lương</label>
+        <select class="form-control" id="BacLuong" name="BacLuong">
+            @foreach (var item in ViewBag.BacLuong)
+            {
+                <option value="@item.BacLuong">@item.BacLuong</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Anh">Ảnh</label>
+        <input type="file" class="form-control" id="Anh" name="Anh" required/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Thêm Nhân Viên</button>
+</form>

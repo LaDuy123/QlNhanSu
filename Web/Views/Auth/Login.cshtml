@@ -1,0 +1,73 @@
+﻿@model Login
+@{
+	ViewData["Title"] = "Đăng nhập";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="login-wrap">
+    <div class="login-html">
+        <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+        <label for="tab-1" class="tab">Đăng nhập</label>
+        <input id="tab-2" type="radio" name="tab" class="sign-up">
+        <label for="tab-2" class="tab">Đăng ký</label>
+        <div class="login-form">
+            <div class="sign-in-htm">
+                <!-- Thêm form để xử lý login -->
+                <form method="post" asp-action="Login">
+                    <div class="group">
+                        <label for="username" class="label">Tên tài khoản</label>
+                        <input id="user" type="text" class="input" name="username" required />
+                    </div>
+                    <div class="group">
+                        <label for="password" class="label">Mật khẩu</label>
+                        <input id="pass" type="password" class="input" name="password" required />
+                    </div>
+                    <div class="group">
+                        <input id="check" type="checkbox" class="check" name="remember" />
+                        <label for="check"><span class="icon"></span> Lưu đăng nhập</label>
+                    </div>
+                    <div class="group">
+                        <button type="submit" class="button">Đăng nhập</button>
+                    </div>
+                </form>
+                <!-- Hiển thị lỗi nếu có -->
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger mt-3">
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+                <div class="hr"></div>
+                <div class="foot-lnk">
+                    <a href="#forgot">Quên mật khẩu?</a>
+                </div>
+            </div>
+            <div class="sign-up-htm">
+                <form method="post" asp-action="Register">
+                    <div class="group">
+                        <label for="signup-user" class="label">Tên tài khoản</label>
+                        <input id="signup-user" type="text" class="input" name="username" required />
+                    </div>
+                    <div class="group">
+                        <label for="signup-pass" class="label">Mật khẩu</label>
+                        <input id="signup-pass" type="password" class="input" name="password" required />
+                    </div>
+                    <div class="group">
+                        <label for="confirm-pass" class="label">Nhập lại mật khẩu</label>
+                        <input id="confirm-pass" type="password" class="input" name="confirmPassword" required />
+                    </div>
+                    <div class="group">
+                        <label for="email" class="label">Địa chỉ email</label>
+                        <input id="email" type="email" class="input" name="email" required />
+                    </div>
+                    <div class="group">
+                        <button type="submit" class="button">Đăng ký</button>
+                    </div>
+                </form>
+                <div class="hr"></div>
+                <div class="foot-lnk">
+                    <label for="tab-1">Đã có tài khoản</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

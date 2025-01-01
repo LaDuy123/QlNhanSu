@@ -7,14 +7,14 @@ namespace BTL.Data
     public class PhongBan
     {
         [Key]
-        public int MaPhongBan { get; set; }
+        public int MaPB { get; set; }
         [Required]
         [MaxLength(100)]
-        public string TenPhongBan { get; set; }
+        public string TenPB { get; set; }
         [Required]
         [MaxLength(100)]
         public string DiaChi { get; set; }
-        public string DienThoai { get; set; }
+        public string SDTPB { get; set; }
         public virtual ICollection<NhanVien> NhanViens { get; set; }
     }
 }

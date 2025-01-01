@@ -17,5 +17,9 @@ namespace BTL.Data
         [Required(ErrorMessage = "Email là bắt buộc.")]
         [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
         public string Email { get; set; }
+        public int? RoleId { get; set; } = 2; // Vai trò mặc định
+
+        [ForeignKey("RoleId")]
+        public virtual Role? Role { get; set; }
     }
 }

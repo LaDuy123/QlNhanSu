@@ -1,18 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace BTL.Data
+﻿namespace BTL.Dto
 {
-    [Table("NhanVien")]
-    public class NhanVien
+    public class NhanVienDto
     {
-        [Key]
         public int MaNV { get; set; }
-        [Required]
-        [MaxLength(100)]
         public string HoTen { get; set; }
-        [Required]
-        [MaxLength(100)]
         public string QueQuan { get; set; }
         public string GioiTinh { get; set; }
         public string DienThoai { get; set; }
@@ -25,13 +16,10 @@ namespace BTL.Data
         public int MaTDHV { get; set; }
         public string BacLuong { get; set; }
         public string Anh { get; set; }
-        [ForeignKey("MaCV")]
-        public CongViec? CongViec { get; set; }
-        [ForeignKey("MaPB")]
-        public PhongBan? PhongBan { get; set; }
-        [ForeignKey("MaTDHV")]
-        public TrinhDoHocVan? TrinhDoHocVan { get; set; }
-        [ForeignKey("BacLuong")]
-        public Luong? luong { get; set; }
+        public string CongViec { get; set; }
+        public string PhongBan { get; set; }
+        public string TrinhDoHocVan { get; set; }
+        public decimal? Luong { get; set; }
     }
+
 }

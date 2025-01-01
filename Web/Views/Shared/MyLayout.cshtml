@@ -58,6 +58,9 @@
 	<script src="js/respond.min.js"></script>
 	<![endif]-->
 
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 <body>
 	<div id="colorlib-page">
@@ -72,8 +75,8 @@
 				<nav id="colorlib-main-menu" role="navigation" class="navbar">
 					<div id="navbar" class="collapse">
 						<ul>
-							<li><a href="/My/Index">Home</a></li>
-							<li><a asp-controller="My" asp-action="Create">Create</a></li>					
+							<li><a href="/NhanVien/Index">Home</a></li>
+									
 							<li><a href="#" data-nav-section="experience">Công việc</a></li>
 							<li><a href="#" data-nav-section="work">Phòng ban</a></li>						
 							<li><a asp-controller="My" asp-action="Mapbox">Mapbox</a></li>
@@ -115,6 +118,7 @@
 						</div>
 					</div>
 				</section>
+				@await Html.PartialAsync("_Notification")
                 @RenderBody()
 
 			</div><!-- end:colorlib-main -->

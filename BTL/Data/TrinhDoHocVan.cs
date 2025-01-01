@@ -3,14 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BTL.Data
 {
-    [Table("CongViec")]
-    public class CongViec
+    [Table("TrinhDoHocVan")]
+    public class TrinhDoHocVan
     {
         [Key]
-        public int MaCV { get; set; }
-        [Required]
-        [MaxLength(50)]
-        public string TenCV{ get; set; }
+        public int MaTDHV {  get; set; }
+        public string TenTDHV { get; set; }
+        public string CNganh { get; set; }
         public virtual ICollection<NhanVien> NhanViens { get; set; }
     }
 }
